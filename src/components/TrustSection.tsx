@@ -21,22 +21,22 @@ const points = [
 const TrustSection = () => {
   return (
     <section id="privacy" className="py-16 md:py-24">
-      <div className="container max-w-4xl">
-        <div className="text-center mb-12 space-y-2">
-          <h2 className="text-2xl md:text-3xl font-bold font-display text-foreground">
+      <div className="container max-w-3xl">
+        <div className="text-center mb-10 md:mb-14 space-y-2">
+          <h2 className="text-2xl md:text-3xl font-bold font-display text-foreground tracking-tight">
             Your words, just clearer
           </h2>
-          <p className="text-muted-foreground">We built this to be simple, safe, and respectful of your privacy.</p>
+          <p className="text-muted-foreground text-sm md:text-base">Simple, safe, and respectful of your privacy.</p>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid md:grid-cols-3 gap-10 md:gap-8">
           {points.map((p, i) => (
-            <div key={i} className="text-center space-y-4">
-              <div className="mx-auto w-14 h-14 rounded-2xl bg-accent flex items-center justify-center">
-                <p.icon size={24} className="text-primary" />
+            <div key={i} className="text-center space-y-3">
+              <div className="mx-auto w-12 h-12 rounded-xl bg-accent flex items-center justify-center">
+                <p.icon size={22} className="text-primary" />
               </div>
-              <h3 className="font-semibold text-foreground">{p.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{p.desc}</p>
+              <h3 className="font-semibold text-foreground text-[15px]">{p.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed max-w-[260px] mx-auto">{p.desc}</p>
             </div>
           ))}
         </div>
