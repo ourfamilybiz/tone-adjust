@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -7,38 +7,38 @@
 @layer base {
   :root {
     --background: 210 20% 98%;
-    --foreground: 220 20% 18%;
+    --foreground: 220 20% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 20% 18%;
+    --card-foreground: 220 20% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 20% 18%;
+    --popover-foreground: 220 20% 15%;
 
     --primary: 221 83% 53%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 210 20% 96%;
-    --secondary-foreground: 220 20% 30%;
+    --secondary-foreground: 220 20% 28%;
 
     --muted: 210 15% 94%;
-    --muted-foreground: 220 10% 50%;
+    --muted-foreground: 220 10% 46%;
 
     --accent: 221 83% 96%;
-    --accent-foreground: 221 83% 40%;
+    --accent-foreground: 221 83% 38%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214 20% 90%;
-    --input: 214 20% 90%;
+    --border: 214 18% 91%;
+    --input: 214 18% 91%;
     --ring: 221 83% 53%;
 
     --radius: 0.75rem;
 
     --surface: 0 0% 100%;
     --surface-raised: 210 20% 99%;
-    --text-subtle: 220 10% 55%;
+    --text-subtle: 220 10% 52%;
     --success: 152 60% 42%;
     --success-foreground: 0 0% 100%;
 
@@ -59,5 +59,8 @@
   }
   body {
     @apply bg-background text-foreground font-sans antialiased;
+  }
+  html {
+    scroll-behavior: smooth;
   }
 }

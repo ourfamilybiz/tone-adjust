@@ -28,7 +28,6 @@ const HeroTool = () => {
   const handleRewrite = () => {
     if (!input.trim()) return;
     setIsRewriting(true);
-    // Simulate API call
     setTimeout(() => {
       setOutput(sampleOutput);
       setIsRewriting(false);
@@ -49,35 +48,33 @@ const HeroTool = () => {
   };
 
   return (
-    <section className="relative py-12 md:py-20">
-      <div className="container max-w-3xl">
+    <section className="relative pt-10 pb-16 md:pt-16 md:pb-24">
+      <div className="container max-w-2xl">
         {/* Headline */}
-        <div className="text-center mb-10 space-y-3">
-          <h1 className="text-3xl md:text-5xl font-bold font-display text-foreground leading-tight">
+        <div className="text-center mb-8 md:mb-12 space-y-3">
+          <h1 className="text-3xl md:text-[2.75rem] font-bold font-display text-foreground leading-[1.15] tracking-tight">
             Say it better.{" "}
             <span className="text-primary">Stay you.</span>
           </h1>
-          <p className="text-muted-foreground text-base md:text-lg max-w-xl mx-auto leading-relaxed">
+          <p className="text-muted-foreground text-base md:text-lg max-w-md mx-auto leading-relaxed">
             Rewrite emails, texts, and replies with the tone you want — in seconds.
           </p>
         </div>
 
         {/* Tool Card */}
-        <div className="bg-surface rounded-2xl shadow-elevated p-5 md:p-8 space-y-5">
+        <div className="bg-card rounded-2xl shadow-elevated border border-border/60 p-5 md:p-7 space-y-5">
           {/* Input */}
-          <div>
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Type or paste your message here..."
-              rows={5}
-              className="w-full rounded-xl border border-border bg-background p-4 text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all text-sm md:text-base"
-            />
-          </div>
+          <textarea
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Type or paste your message here..."
+            rows={4}
+            className="w-full rounded-xl border border-border bg-background p-4 text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary/40 transition-all text-sm md:text-base leading-relaxed"
+          />
 
           {/* Tone selector */}
           <div className="space-y-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Tone</p>
+            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">Tone</p>
             <div className="flex flex-wrap gap-2">
               {tones.map((tone) => (
                 <Button
@@ -94,7 +91,7 @@ const HeroTool = () => {
 
           {/* Modifiers */}
           <div className="space-y-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Options</p>
+            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">Options</p>
             <div className="flex flex-wrap gap-2">
               {modifiers.map((mod) => (
                 <Button
@@ -110,7 +107,7 @@ const HeroTool = () => {
           </div>
 
           {/* Actions */}
-          <div className="flex gap-3">
+          <div className="flex gap-3 pt-1">
             <Button
               variant="rewrite"
               onClick={handleRewrite}
@@ -118,10 +115,10 @@ const HeroTool = () => {
               className="flex-1"
             >
               <Sparkles size={18} />
-              {isRewriting ? "Rewriting..." : "Rewrite Message"}
+              {isRewriting ? "Rewriting…" : "Rewrite Message"}
             </Button>
             {(input || output) && (
-              <Button variant="outline" size="lg" onClick={handleReset}>
+              <Button variant="outline" size="lg" onClick={handleReset} className="px-4">
                 <RotateCcw size={16} />
               </Button>
             )}
@@ -129,10 +126,10 @@ const HeroTool = () => {
 
           {/* Output */}
           {output && (
-            <div className="animate-fade-in space-y-3">
+            <div className="animate-fade-in space-y-3 pt-1">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Improved Message</p>
-                <Button variant="ghost" size="sm" onClick={handleCopy} className="gap-1.5">
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">Improved Message</p>
+                <Button variant="ghost" size="sm" onClick={handleCopy} className="gap-1.5 h-8 text-xs">
                   {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
                   {copied ? "Copied!" : "Copy"}
                 </Button>
@@ -140,7 +137,7 @@ const HeroTool = () => {
               <div
                 contentEditable
                 suppressContentEditableWarning
-                className="rounded-xl border border-primary/20 bg-accent/50 p-4 text-foreground text-sm md:text-base leading-relaxed focus:outline-none focus:ring-2 focus:ring-primary/30"
+                className="rounded-xl border border-primary/15 bg-accent/40 p-4 text-foreground text-sm md:text-base leading-relaxed focus:outline-none focus:ring-2 focus:ring-primary/20"
               >
                 {output}
               </div>
@@ -148,7 +145,7 @@ const HeroTool = () => {
           )}
 
           {/* Trust note */}
-          <p className="text-center text-xs text-muted-foreground pt-2">
+          <p className="text-center text-xs text-muted-foreground pt-1">
             🔒 We don't store your messages. Your privacy matters.
           </p>
         </div>
