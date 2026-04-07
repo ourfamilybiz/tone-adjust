@@ -1,61 +1,177 @@
-import { useState } from "react";
-import { Menu, X } from "lucide-react";
+// File: src/components/Header.tsx
 
-const navLinks = [
-  { label: "How It Works", href: "#how-it-works" },
-  { label: "Use Cases", href: "#use-cases" },
-  { label: "Privacy", href: "#privacy" },
-  { label: "Contact", href: "#contact" },
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+
+const navItems = [
+  { label: "Home", path: "/" },
+  { label: "Professional", path: "/make-message-professional" },
+  { label: "Apology", path: "/apology-message-generator" },
+  { label: "Fix Awkward", path: "/fix-awkward-text" },
+  { label: "All Tools", path: "/tools" },
 ];
 
 const Header = () => {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isPro, setIsPro] = useState(false);
+
+  const isActive = (path: string) => location.pathname === path;
+
+  useEffect(() => {
+    loadHeaderState();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(() => {
+      loadHeaderState();
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  async function loadHeaderState() {
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const email = session?.user?.email ?? null;
+      setUserEmail(email);
+
+      if (!email) {
+        setIsPro(false);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("user_subscriptions")
+        .select("plan,status")
+        .eq("user_email", email)
+        .maybeSingle();
+
+      if (error) {
+        console.error(error);
+        setIsPro(false);
+        return;
+      }
+
+      const pro =
+        data?.plan === "pro" &&
+        (data?.status === "active" || data?.status === "trialing");
+
+      setIsPro(!!pro);
+    } catch (error) {
+      console.error(error);
+      setIsPro(false);
+    }
+  }
 
   return (
-    <header className="sticky top-0 z-50 bg-card/85 backdrop-blur-xl border-b border-border/60">
-      <div className="container flex items-center justify-between h-14 md:h-16">
-        <a href="#" className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-xs">R</span>
+    <header className="sticky top-0 z-50 border-b border-border/70 bg-background/88 backdrop-blur-md">
+      <div className="container max-w-6xl">
+        <div className="flex flex-col gap-3 py-4 md:flex-row md:items-center md:justify-between md:py-4">
+          <div className="flex items-center justify-between gap-4">
+            <Link
+              to="/"
+              className="group inline-flex items-center gap-3"
+              aria-label="Go to homepage"
+            >
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm transition group-hover:bg-primary/15">
+                <span className="text-base font-bold">S</span>
+              </div>
+
+              <div className="leading-tight">
+                <p className="text-base font-semibold tracking-tight text-foreground md:text-lg">
+                  SayItBetter
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Clearer messages. Less overthinking.
+                </p>
+              </div>
+            </Link>
           </div>
-          <span className="font-display font-bold text-base text-foreground">Rewordly</span>
-        </a>
 
-        <nav className="hidden md:flex items-center gap-7">
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="text-[13px] text-muted-foreground hover:text-foreground transition-colors font-medium"
+          <div className="flex flex-col gap-3 md:items-end">
+            <nav
+              className="flex flex-wrap items-center gap-2 md:justify-end"
+              aria-label="Primary navigation"
             >
-              {link.label}
-            </a>
-          ))}
-        </nav>
+              {navItems.map((item) => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={[
+                    "inline-flex items-center rounded-full border px-4 py-2 text-sm font-medium transition-all",
+                    isActive(item.path)
+                      ? "border-primary/20 bg-primary text-primary-foreground shadow-sm"
+                      : "border-border bg-background text-muted-foreground hover:border-primary/20 hover:bg-primary/5 hover:text-foreground",
+                  ].join(" ")}
+                >
+                  {item.label}
+                </Link>
+              ))}
 
-        <button
-          onClick={() => setMenuOpen(!menuOpen)}
-          className="md:hidden p-2 text-foreground"
-          aria-label="Toggle menu"
-        >
-          {menuOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
+              {userEmail ? (
+                <Link
+                  to="/account"
+                  className={[
+                    "inline-flex items-center rounded-full border px-4 py-2 text-sm font-medium transition-all",
+                    isActive("/account")
+                      ? "border-primary/20 bg-primary text-primary-foreground shadow-sm"
+                      : "border-border bg-background text-muted-foreground hover:border-primary/20 hover:bg-primary/5 hover:text-foreground",
+                  ].join(" ")}
+                >
+                  Account
+                </Link>
+              ) : (
+                <Link
+                  to="/auth"
+                  className={[
+                    "inline-flex items-center rounded-full border px-4 py-2 text-sm font-medium transition-all",
+                    isActive("/auth")
+                      ? "border-primary/20 bg-primary text-primary-foreground shadow-sm"
+                      : "border-border bg-background text-muted-foreground hover:border-primary/20 hover:bg-primary/5 hover:text-foreground",
+                  ].join(" ")}
+                >
+                  Sign In
+                </Link>
+              )}
+
+              {!isPro && (
+                <Link
+                  to="/upgrade"
+                  className={[
+                    "inline-flex items-center rounded-full border px-4 py-2 text-sm font-medium transition-all",
+                    isActive("/upgrade")
+                      ? "border-primary/20 bg-primary text-primary-foreground shadow-sm"
+                      : "border-border bg-background text-muted-foreground hover:border-primary/20 hover:bg-primary/5 hover:text-foreground",
+                  ].join(" ")}
+                >
+                  Upgrade
+                </Link>
+              )}
+            </nav>
+
+            <div className="flex flex-wrap items-center gap-2 md:justify-end">
+              {isPro && (
+                <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-primary">
+                  Pro
+                </span>
+              )}
+
+              {userEmail && (
+                <span className="text-xs text-muted-foreground">
+                  {userEmail}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-
-      {menuOpen && (
-        <nav className="md:hidden border-t border-border bg-card px-6 py-4 space-y-3">
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={() => setMenuOpen(false)}
-              className="block text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              {link.label}
-            </a>
-          ))}
-        </nav>
-      )}
     </header>
   );
 };

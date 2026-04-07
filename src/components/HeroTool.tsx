@@ -1,157 +1,598 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Copy, Check, Sparkles, RotateCcw } from "lucide-react";
+// File: src/components/HeroTool.tsx
 
-const tones = ["Professional", "Casual", "Persuasive", "Apology", "Confident"];
-const modifiers = ["Make shorter", "Fix grammar", "More confident"];
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Copy, Check, Sparkles, Lock } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { loadToneProfile, type ToneProfile } from "@/lib/toneProfile";
 
-const sampleOutput = `Thank you for reaching out. I appreciate your patience, and I'd like to address your concerns directly.
+type Props = {
+  title: string;
+  subtitle: string;
+  placeholder: string;
+  defaultTone?: string;
+};
 
-After reviewing the situation, I believe the best path forward is to schedule a brief call so we can align on expectations and next steps. Would Thursday or Friday work for you?
+type ToolMode = "rewrite" | "generate";
+type ProGenerateStyle = "standard" | "compare";
 
-Looking forward to resolving this together.`;
+const toneOptions = [
+  "Professional",
+  "Polite",
+  "Calm",
+  "Warm",
+  "Casual",
+  "Confident",
+  "Apology",
+  "Persuasive",
+];
 
-const HeroTool = () => {
+const DAILY_FREE_LIMIT = 5;
+const STORAGE_KEY = "sayitbetter_daily_usage";
+
+type UsageState = {
+  date: string;
+  count: number;
+};
+
+function getTodayKey() {
+  return new Date().toISOString().slice(0, 10);
+}
+
+function getUsageState(): UsageState {
+  if (typeof window === "undefined") {
+    return {
+      date: getTodayKey(),
+      count: 0,
+    };
+  }
+
+  const today = getTodayKey();
+  const raw = window.localStorage.getItem(STORAGE_KEY);
+
+  if (!raw) {
+    return { date: today, count: 0 };
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as UsageState;
+
+    if (parsed.date !== today) {
+      return { date: today, count: 0 };
+    }
+
+    return {
+      date: parsed.date || today,
+      count: typeof parsed.count === "number" ? parsed.count : 0,
+    };
+  } catch {
+    return { date: today, count: 0 };
+  }
+}
+
+function saveUsageState(state: UsageState) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+function normalizeTone(defaultTone: string) {
+  if (toneOptions.includes(defaultTone)) return defaultTone;
+  return "Professional";
+}
+
+export default function HeroTool({
+  title,
+  subtitle,
+  placeholder,
+  defaultTone = "Professional",
+}: Props) {
+  const navigate = useNavigate();
+
+  const normalizedDefaultTone = useMemo(
+    () => normalizeTone(defaultTone),
+    [defaultTone]
+  );
+
+  const [mode, setMode] = useState<ToolMode>("rewrite");
   const [input, setInput] = useState("");
-  const [selectedTone, setSelectedTone] = useState("Professional");
-  const [activeModifiers, setActiveModifiers] = useState<string[]>([]);
   const [output, setOutput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [tone, setTone] = useState(normalizedDefaultTone);
   const [copied, setCopied] = useState(false);
-  const [isRewriting, setIsRewriting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [usageCount, setUsageCount] = useState(0);
+  const [usageReady, setUsageReady] = useState(false);
+  const [subscriptionReady, setSubscriptionReady] = useState(false);
+  const [isPro, setIsPro] = useState(false);
+  const [toneProfile, setToneProfile] = useState<ToneProfile | null>(null);
+  const [proGenerateStyle, setProGenerateStyle] =
+    useState<ProGenerateStyle>("standard");
 
-  const toggleModifier = (mod: string) => {
-    setActiveModifiers((prev) =>
-      prev.includes(mod) ? prev.filter((m) => m !== mod) : [...prev, mod]
-    );
-  };
+  useEffect(() => {
+    const usage = getUsageState();
+    saveUsageState(usage);
+    setUsageCount(usage.count);
+    setUsageReady(true);
+    setToneProfile(loadToneProfile());
 
-  const handleRewrite = () => {
-    if (!input.trim()) return;
-    setIsRewriting(true);
-    setTimeout(() => {
-      setOutput(sampleOutput);
-      setIsRewriting(false);
-    }, 1200);
-  };
+    loadSubscription();
+  }, []);
 
-  const handleCopy = async () => {
+  async function loadSubscription() {
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const email = session?.user?.email;
+
+      if (!email) {
+        setIsPro(false);
+        setSubscriptionReady(true);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("user_subscriptions")
+        .select("plan,status")
+        .eq("user_email", email)
+        .maybeSingle();
+
+      if (error) {
+        console.error(error);
+        setIsPro(false);
+        setSubscriptionReady(true);
+        return;
+      }
+
+      const pro =
+        data?.plan === "pro" &&
+        (data?.status === "active" || data?.status === "trialing");
+
+      setIsPro(!!pro);
+    } catch (err) {
+      console.error(err);
+      setIsPro(false);
+    } finally {
+      setSubscriptionReady(true);
+    }
+  }
+
+  const trimmedInput = useMemo(() => input.trim(), [input]);
+  const usesRemaining = Math.max(0, DAILY_FREE_LIMIT - usageCount);
+  const limitReached =
+    usageReady && subscriptionReady && !isPro && usageCount >= DAILY_FREE_LIMIT;
+  const canGenerate =
+    usageReady &&
+    subscriptionReady &&
+    trimmedInput.length > 0 &&
+    !loading &&
+    !limitReached;
+
+  const activePlaceholder =
+    mode === "rewrite"
+      ? placeholder
+      : "Describe what happened, who this is for, what outcome you want, and how you want it to sound.";
+
+  const helperText =
+    mode === "rewrite"
+      ? "Paste the message you already wrote and the tool will improve it."
+      : "Explain the situation in your own words and the tool will create the message or document for you.";
+
+  const modeHeading =
+    mode === "rewrite"
+      ? "Improve what you already wrote"
+      : "Create the message from your situation";
+
+  const generateHint =
+    mode === "generate"
+      ? "Example: My client has not paid the invoice, this is for a business customer, I want to sound firm but respectful, and I want them to pay by Friday."
+      : "";
+
+  async function handleGenerate() {
+    if (!trimmedInput || limitReached) return;
+
+    setLoading(true);
+    setOutput("");
+    setErrorMessage("");
+    setCopied(false);
+
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "rewrite-message",
+        {
+          body: {
+            text: trimmedInput,
+            tone,
+            mode,
+            proGenerateStyle:
+              isPro && mode === "generate" ? proGenerateStyle : "standard",
+            toneProfile:
+              isPro && mode === "generate" ? toneProfile ?? undefined : undefined,
+          },
+        }
+      );
+
+      if (error) {
+        console.error(error);
+        setErrorMessage("Something went wrong while generating your result.");
+        return;
+      }
+
+      if (!data?.result) {
+        setErrorMessage("No result was returned.");
+        return;
+      }
+
+      setOutput(data.result);
+
+      if (!isPro) {
+        const nextUsage = {
+          date: getTodayKey(),
+          count: usageCount + 1,
+        };
+
+        saveUsageState(nextUsage);
+        setUsageCount(nextUsage.count);
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorMessage("Something went wrong while generating your result.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleCopy() {
     if (!output) return;
-    await navigator.clipboard.writeText(output);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
 
-  const handleReset = () => {
+    try {
+      await navigator.clipboard.writeText(output);
+      setCopied(true);
+
+      window.setTimeout(() => {
+        setCopied(false);
+      }, 1800);
+    } catch (err) {
+      console.error(err);
+      setErrorMessage("Could not copy the result.");
+    }
+  }
+
+  function handleClear() {
     setInput("");
     setOutput("");
-    setActiveModifiers([]);
-  };
+    setErrorMessage("");
+    setCopied(false);
+    setTone(normalizedDefaultTone);
+    setMode("rewrite");
+    setProGenerateStyle("standard");
+  }
+
+  function handleUpgradeClick() {
+    navigate("/upgrade");
+  }
 
   return (
-    <section className="relative pt-10 pb-16 md:pt-16 md:pb-24">
-      <div className="container max-w-2xl">
-        {/* Headline */}
-        <div className="text-center mb-8 md:mb-12 space-y-3">
-          <h1 className="text-3xl md:text-[2.75rem] font-bold font-display text-foreground leading-[1.15] tracking-tight">
-            Say it better.{" "}
-            <span className="text-primary">Stay you.</span>
-          </h1>
-          <p className="text-muted-foreground text-base md:text-lg max-w-md mx-auto leading-relaxed">
-            Rewrite emails, texts, and replies with the tone you want — in seconds.
-          </p>
-        </div>
+    <section className="pt-10 pb-8 md:pt-14 md:pb-10">
+      <div className="container max-w-4xl">
+        <div className="rounded-3xl border border-border bg-card p-6 shadow-sm md:p-8">
+          <div className="space-y-6">
+            <div className="space-y-3">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+                AI Message Tool
+              </p>
 
-        {/* Tool Card */}
-        <div className="bg-card rounded-2xl shadow-elevated border border-border/60 p-5 md:p-7 space-y-5">
-          {/* Input */}
-          <textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Type or paste your message here..."
-            rows={4}
-            className="w-full rounded-xl border border-border bg-background p-4 text-foreground placeholder:text-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-primary/25 focus:border-primary/40 transition-all text-sm md:text-base leading-relaxed"
-          />
+              <div className="space-y-2">
+                <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+                  {title}
+                </h1>
 
-          {/* Tone selector */}
-          <div className="space-y-2">
-            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">Tone</p>
-            <div className="flex flex-wrap gap-2">
-              {tones.map((tone) => (
-                <Button
-                  key={tone}
-                  variant={selectedTone === tone ? "pill-active" : "pill"}
-                  size="sm"
-                  onClick={() => setSelectedTone(tone)}
-                >
-                  {tone}
-                </Button>
-              ))}
+                <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
+                  {subtitle}
+                </p>
+              </div>
             </div>
-          </div>
 
-          {/* Modifiers */}
-          <div className="space-y-2">
-            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">Options</p>
-            <div className="flex flex-wrap gap-2">
-              {modifiers.map((mod) => (
-                <Button
-                  key={mod}
-                  variant={activeModifiers.includes(mod) ? "pill-active" : "pill"}
-                  size="sm"
-                  onClick={() => toggleModifier(mod)}
-                >
-                  {mod}
-                </Button>
-              ))}
+            <div className="rounded-2xl border border-border bg-background/80 px-4 py-4">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-medium text-foreground">
+                    {isPro ? "Pro access" : "Free daily usage"}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    {isPro
+                      ? "Unlimited usage unlocked on this account"
+                      : usesRemaining > 0
+                      ? `${usesRemaining} of ${DAILY_FREE_LIMIT} free uses remaining today`
+                      : `You have reached your ${DAILY_FREE_LIMIT} free uses for today`}
+                  </p>
+                </div>
+
+                {!isPro && (
+                  <div className="h-2 w-full max-w-[180px] overflow-hidden rounded-full bg-muted sm:w-[180px]">
+                    <div
+                      className="h-full rounded-full bg-primary transition-all"
+                      style={{
+                        width: `${Math.min(
+                          100,
+                          (usageCount / DAILY_FREE_LIMIT) * 100
+                        )}%`,
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Actions */}
-          <div className="flex gap-3 pt-1">
-            <Button
-              variant="rewrite"
-              onClick={handleRewrite}
-              disabled={!input.trim() || isRewriting}
-              className="flex-1"
-            >
-              <Sparkles size={18} />
-              {isRewriting ? "Rewriting…" : "Rewrite Message"}
-            </Button>
-            {(input || output) && (
-              <Button variant="outline" size="lg" onClick={handleReset} className="px-4">
-                <RotateCcw size={16} />
-              </Button>
+            <div className="space-y-3">
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => setMode("rewrite")}
+                  className={`rounded-xl px-4 py-2 text-sm font-medium transition ${
+                    mode === "rewrite"
+                      ? "bg-primary text-primary-foreground"
+                      : "border border-border bg-background text-foreground hover:bg-muted"
+                  }`}
+                >
+                  Use My Draft
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setMode("generate")}
+                  className={`rounded-xl px-4 py-2 text-sm font-medium transition ${
+                    mode === "generate"
+                      ? "bg-primary text-primary-foreground"
+                      : "border border-border bg-background text-foreground hover:bg-muted"
+                  }`}
+                >
+                  Describe Situation
+                </button>
+              </div>
+
+              <div className="rounded-2xl border border-border bg-background/80 px-4 py-4">
+                <p className="text-sm font-medium text-foreground">
+                  {modeHeading}
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  {helperText}
+                </p>
+                {mode === "generate" && (
+                  <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+                    {generateHint}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {limitReached && (
+              <div className="rounded-3xl border border-primary/20 bg-primary/5 p-6 md:p-7">
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3">
+                    <div className="mt-1 text-primary">
+                      <Lock size={20} />
+                    </div>
+
+                    <div>
+                      <p className="text-base font-semibold text-foreground">
+                        You’ve reached your free limit
+                      </p>
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        You’ve used all {DAILY_FREE_LIMIT} free messages for
+                        today.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-2xl border border-border bg-background p-4">
+                    <p className="text-sm font-medium text-foreground">
+                      Upgrade to Pro and unlock:
+                    </p>
+
+                    <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
+                      <li>• Unlimited message rewrites</li>
+                      <li>• Generate messages from situations</li>
+                      <li>• Tone DNA personalization</li>
+                      <li>• “Closer to me” vs “Best for this situation” comparison</li>
+                    </ul>
+                  </div>
+
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <button
+                      type="button"
+                      onClick={handleUpgradeClick}
+                      className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-95"
+                    >
+                      Upgrade to Pro
+                    </button>
+
+                    <p className="text-xs text-muted-foreground">
+                      Start free. Upgrade anytime.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              <label
+                htmlFor="hero-tool-input"
+                className="text-sm font-medium text-foreground"
+              >
+                {mode === "rewrite" ? "Your message" : "Your situation"}
+              </label>
+
+              <textarea
+                id="hero-tool-input"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={activePlaceholder}
+                className="min-h-[180px] w-full rounded-2xl border border-border bg-background px-4 py-4 text-sm leading-relaxed text-foreground outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+              />
+
+              <div className="flex flex-col gap-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+                <p>
+                  Tip: the more useful context you give, the better the result
+                  usually is.
+                </p>
+                <p>{trimmedInput.length} characters</p>
+              </div>
+            </div>
+
+            {mode === "generate" && isPro && (
+              <div className="rounded-2xl border border-border bg-background/80 px-4 py-4">
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm font-medium text-foreground">
+                      Pro generation options
+                    </p>
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      Choose whether you want one strong version or a comparison
+                      between your natural voice and the version that best fits
+                      the situation.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setProGenerateStyle("standard")}
+                      className={`rounded-xl px-4 py-2 text-sm font-medium transition ${
+                        proGenerateStyle === "standard"
+                          ? "bg-primary text-primary-foreground"
+                          : "border border-border bg-background text-foreground hover:bg-muted"
+                      }`}
+                    >
+                      Best single version
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setProGenerateStyle("compare")}
+                      className={`rounded-xl px-4 py-2 text-sm font-medium transition ${
+                        proGenerateStyle === "compare"
+                          ? "bg-primary text-primary-foreground"
+                          : "border border-border bg-background text-foreground hover:bg-muted"
+                      }`}
+                    >
+                      Compare both
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {mode === "generate" && !isPro && (
+              <div className="rounded-2xl border border-border bg-background/80 px-4 py-4">
+                <p className="text-sm font-medium text-foreground">
+                  Pro feature available
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Pro users can compare a version that feels closer to their
+                  natural voice with a version that is best suited for the
+                  situation.
+                </p>
+              </div>
+            )}
+
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <label
+                  htmlFor="hero-tool-tone"
+                  className="text-sm font-medium text-foreground"
+                >
+                  Tone
+                </label>
+
+                <select
+                  id="hero-tool-tone"
+                  value={tone}
+                  onChange={(e) => setTone(e.target.value)}
+                  className="rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+                >
+                  {toneOptions.map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={handleClear}
+                  className="rounded-xl border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted"
+                >
+                  Clear
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleGenerate}
+                  disabled={!canGenerate}
+                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <Sparkles size={16} />
+                  {loading
+                    ? mode === "rewrite"
+                      ? "Rewriting..."
+                      : "Generating..."
+                    : mode === "rewrite"
+                    ? "Rewrite"
+                    : "Generate"}
+                </button>
+              </div>
+            </div>
+
+            {errorMessage && (
+              <div className="rounded-2xl border border-destructive/20 bg-destructive/5 px-4 py-3 text-sm text-destructive">
+                {errorMessage}
+              </div>
+            )}
+
+            {!output && !loading && !errorMessage && !limitReached && (
+              <div className="rounded-2xl border border-dashed border-border bg-background/80 px-4 py-5">
+                <p className="text-sm text-muted-foreground">
+                  {mode === "rewrite"
+                    ? "Your rewritten result will appear here after you click Rewrite."
+                    : "Your generated message or document will appear here after you click Generate."}
+                </p>
+              </div>
+            )}
+
+            {output && (
+              <div className="rounded-2xl border border-border bg-background p-4 md:p-5">
+                <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="font-semibold text-foreground">Result</p>
+                    <p className="text-xs text-muted-foreground">
+                      Review it, copy it, and edit it however you want.
+                    </p>
+                  </div>
+
+                  <button
+  type="button"
+  onClick={handleCopy}
+  className="inline-flex items-center gap-2 self-start rounded-xl border border-border bg-card px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted"
+>
+  {copied ? <Check size={14} /> : <Copy size={14} />}
+  <span>{copied ? "Copied" : "Copy"}</span>
+</button>
+                </div>
+
+                <div className="rounded-2xl border border-border bg-card px-4 py-4">
+                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                    {output}
+                  </p>
+                </div>
+              </div>
             )}
           </div>
-
-          {/* Output */}
-          {output && (
-            <div className="animate-fade-in space-y-3 pt-1">
-              <div className="flex items-center justify-between">
-                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-widest">Improved Message</p>
-                <Button variant="ghost" size="sm" onClick={handleCopy} className="gap-1.5 h-8 text-xs">
-                  {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
-                  {copied ? "Copied!" : "Copy"}
-                </Button>
-              </div>
-              <div
-                contentEditable
-                suppressContentEditableWarning
-                className="rounded-xl border border-primary/15 bg-accent/40 p-4 text-foreground text-sm md:text-base leading-relaxed focus:outline-none focus:ring-2 focus:ring-primary/20"
-              >
-                {output}
-              </div>
-            </div>
-          )}
-
-          {/* Trust note */}
-          <p className="text-center text-xs text-muted-foreground pt-1">
-            🔒 We don't store your messages. Your privacy matters.
-          </p>
         </div>
       </div>
     </section>
   );
-};
-
-export default HeroTool;
+}
