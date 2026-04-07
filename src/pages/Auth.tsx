@@ -42,9 +42,17 @@ const Auth = () => {
 
     try {
       if (mode === "signup") {
+        const redirectUrl =
+          window.location.hostname === "localhost"
+            ? "http://localhost:5173/auth"
+            : "https://tone-adjust.vercel.app/auth";
+
         const { error } = await supabase.auth.signUp({
           email,
           password,
+          options: {
+            emailRedirectTo: redirectUrl,
+          },
         });
 
         if (error) {
@@ -52,7 +60,11 @@ const Auth = () => {
           return;
         }
 
-        setMessage("Account created. You can now sign in.");
+        setMessage(
+          "Account created. Check your email to confirm your account, then return here to sign in."
+        );
+        setEmail("");
+        setPassword("");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -93,7 +105,6 @@ const Auth = () => {
     <div className="min-h-screen bg-background">
       <Header />
 
-
       <section className="pt-12 pb-16 md:pt-16 md:pb-20">
         <div className="container max-w-2xl">
           <div className="rounded-3xl border border-border bg-card p-6 shadow-sm md:p-8">
@@ -108,7 +119,8 @@ const Auth = () => {
                 </h1>
 
                 <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
-                  This is the first step needed before we can unlock Pro access after payment.
+                  This is the first step needed before we can unlock Pro access
+                  after payment.
                 </p>
               </div>
 
@@ -116,7 +128,9 @@ const Auth = () => {
                 <div className="space-y-4">
                   <div className="rounded-2xl border border-border bg-background p-4">
                     <p className="text-sm text-muted-foreground">Signed in as</p>
-                    <p className="mt-1 font-medium text-foreground">{userEmail}</p>
+                    <p className="mt-1 font-medium text-foreground">
+                      {userEmail}
+                    </p>
                   </div>
 
                   <button
