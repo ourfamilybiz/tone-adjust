@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <url>
+    <loc>https://tone-adjust.vercel.app/</loc>
+    <priority>1.0</priority>
+  </url>
+
+  <url>
+    <loc>https://tone-adjust.vercel.app/tools</loc>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tone-adjust.vercel.app/make-message-professional</loc>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tone-adjust.vercel.app/apology-message-generator</loc>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tone-adjust.vercel.app/follow-up-message-generator</loc>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tone-adjust.vercel.app/ask-for-payment-professionally</loc>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tone-adjust.vercel.app/fix-awkward-text</loc>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tone-adjust.vercel.app/rewrite-more-politely</loc>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tone-adjust.vercel.app/customer-response-generator</loc>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tone-adjust.vercel.app/thank-you-message-generator</loc>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tone-adjust.vercel.app/reschedule-message-generator</loc>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tone-adjust.vercel.app/reply-to-difficult-message</loc>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tone-adjust.vercel.app/shorten-message-tool</loc>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tone-adjust.vercel.app/make-message-clearer</loc>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tone-adjust.vercel.app/upgrade</loc>
+    <priority>0.7</priority>
+  </url>
+
+<url>
+  <loc>https://tone-adjust.vercel.app/write-better</loc>
+  <priority>0.9</priority>
+</url>
+
+</urlset>

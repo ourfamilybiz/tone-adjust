@@ -12,6 +12,7 @@ import AllTools from "./pages/AllTools.tsx";
 import Upgrade from "./pages/Upgrade.tsx";
 import Auth from "./pages/Auth.tsx";
 import Account from "./pages/Account.tsx";
+import WriteBetterLanding from "./pages/WriteBetterLanding.tsx";
 
 import MakeMessageProfessional from "./pages/MakeMessageProfessional.tsx";
 import ApologyMessageGenerator from "./pages/ApologyMessageGenerator.tsx";
@@ -39,6 +40,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/write-better" element={<WriteBetterLanding />} />
           <Route path="/tools" element={<AllTools />} />
           <Route path="/upgrade" element={<Upgrade />} />
           <Route path="/auth" element={<Auth />} />
