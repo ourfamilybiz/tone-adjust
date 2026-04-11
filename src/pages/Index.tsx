@@ -30,15 +30,11 @@ const Index = () => {
           name="description"
           content="Rewrite messages or generate emails from a situation. Say It Better helps you communicate clearly, professionally, and confidently."
         />
-
-        {/* ✅ Google Search Console Verification */}
         <meta
           name="google-site-verification"
           content="TO_O-RPIi1pNrUMI_eh-dRaAkWZ04yqU2ARV9eMgXT8"
         />
       </Helmet>
-
-      {/* --- EVERYTHING BELOW IS UNCHANGED --- */}
 
       <section className="relative overflow-hidden border-b border-border/70 bg-[#071126] text-white">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(88,110,255,0.22),transparent_38%),radial-gradient(circle_at_top_right,rgba(0,214,255,0.14),transparent_28%),radial-gradient(circle_at_bottom_center,rgba(122,69,255,0.16),transparent_34%)]" />
@@ -80,10 +76,12 @@ const Index = () => {
                 </h1>
 
                 <p className="max-w-2xl text-base leading-relaxed text-white/75 md:text-xl">
-                  Part of the <span className="font-semibold text-white">Aision Labs</span>{" "}
-                  ecosystem, <span className="font-semibold text-white">Say It Better</span> helps
-                  users rewrite what they already wrote or generate the message
-                  or document that best fits the situation.
+                  Part of the{" "}
+                  <span className="font-semibold text-white">Aision Labs</span>{" "}
+                  ecosystem,{" "}
+                  <span className="font-semibold text-white">Say It Better</span>{" "}
+                  helps users rewrite what they already wrote or generate the
+                  message or document that best fits the situation.
                 </p>
               </div>
 
@@ -164,13 +162,13 @@ const Index = () => {
                     Built for real use
                   </p>
                   <p className="mt-1 text-xs leading-relaxed text-white/65">
-                    Helpful for work, client, apology, follow-up, and payment situations.
+                    Helpful for work, client, apology, follow-up, and payment
+                    situations.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* RIGHT SIDE unchanged */}
             <div className="space-y-5">
               <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-white/6 p-3 shadow-[0_20px_80px_rgba(12,24,68,0.55)] backdrop-blur-sm">
                 <img
@@ -212,7 +210,8 @@ const Index = () => {
                 <div>
                   <p className="text-sm font-semibold text-white">Aision Labs</p>
                   <p className="text-xs leading-relaxed text-white/65">
-                    Parent brand for intelligent business and communication tools.
+                    Parent brand for intelligent business and communication
+                    tools.
                   </p>
                 </div>
               </div>

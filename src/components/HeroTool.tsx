@@ -1,8 +1,15 @@
 // File: src/components/HeroTool.tsx
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Copy, Check, Sparkles, Lock } from "lucide-react";
+import {
+  Copy,
+  Check,
+  Sparkles,
+  Lock,
+  ArrowDown,
+  RefreshCcw,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { loadToneProfile, type ToneProfile } from "@/lib/toneProfile";
 
@@ -87,6 +94,7 @@ export default function HeroTool({
   defaultTone = "Professional",
 }: Props) {
   const navigate = useNavigate();
+  const outputRef = useRef<HTMLDivElement | null>(null);
 
   const normalizedDefaultTone = useMemo(
     () => normalizeTone(defaultTone),
@@ -107,6 +115,7 @@ export default function HeroTool({
   const [toneProfile, setToneProfile] = useState<ToneProfile | null>(null);
   const [proGenerateStyle, setProGenerateStyle] =
     useState<ProGenerateStyle>("standard");
+  const [showReadyNotice, setShowReadyNotice] = useState(false);
 
   useEffect(() => {
     const usage = getUsageState();
@@ -117,6 +126,28 @@ export default function HeroTool({
 
     loadSubscription();
   }, []);
+
+  useEffect(() => {
+    if (!output || !outputRef.current) return;
+
+    setShowReadyNotice(true);
+
+    const timer = window.setTimeout(() => {
+      outputRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 120);
+
+    const hideTimer = window.setTimeout(() => {
+      setShowReadyNotice(false);
+    }, 2500);
+
+    return () => {
+      window.clearTimeout(timer);
+      window.clearTimeout(hideTimer);
+    };
+  }, [output]);
 
   async function loadSubscription() {
     try {
@@ -196,6 +227,14 @@ export default function HeroTool({
     setOutput("");
     setErrorMessage("");
     setCopied(false);
+    setShowReadyNotice(false);
+
+    if (outputRef.current) {
+      outputRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
 
     try {
       const { data, error } = await supabase.functions.invoke(
@@ -267,6 +306,7 @@ export default function HeroTool({
     setTone(normalizedDefaultTone);
     setMode("rewrite");
     setProGenerateStyle("standard");
+    setShowReadyNotice(false);
   }
 
   function handleUpgradeClick() {
@@ -553,43 +593,79 @@ export default function HeroTool({
               </div>
             )}
 
-            {!output && !loading && !errorMessage && !limitReached && (
-              <div className="rounded-2xl border border-dashed border-border bg-background/80 px-4 py-5">
-                <p className="text-sm text-muted-foreground">
-                  {mode === "rewrite"
-                    ? "Your rewritten result will appear here after you click Rewrite."
-                    : "Your generated message or document will appear here after you click Generate."}
-                </p>
-              </div>
-            )}
-
-            {output && (
-              <div className="rounded-2xl border border-border bg-background p-4 md:p-5">
-                <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                  <div>
-                    <p className="font-semibold text-foreground">Result</p>
-                    <p className="text-xs text-muted-foreground">
-                      Review it, copy it, and edit it however you want.
-                    </p>
+            <div ref={outputRef} className="scroll-mt-28">
+              {loading && (
+                <div className="rounded-2xl border border-primary/20 bg-primary/5 px-4 py-5">
+                  <div className="mb-3 flex items-center gap-2 text-sm font-medium text-foreground">
+                    <RefreshCcw size={16} className="animate-spin" />
+                    {mode === "rewrite"
+                      ? "Rewriting your message..."
+                      : "Generating your message..."}
                   </div>
 
-                  <button
-  type="button"
-  onClick={handleCopy}
-  className="inline-flex items-center gap-2 self-start rounded-xl border border-border bg-card px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted"
->
-  {copied ? <Check size={14} /> : <Copy size={14} />}
-  <span>{copied ? "Copied" : "Copy"}</span>
-</button>
-                </div>
-
-                <div className="rounded-2xl border border-border bg-card px-4 py-4">
-                  <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
-                    {output}
+                  <p className="text-sm text-muted-foreground">
+                    Please wait. Your result will appear here automatically when
+                    it’s ready.
                   </p>
+
+                  <div className="mt-4 space-y-3">
+                    <div className="h-4 w-full animate-pulse rounded bg-muted" />
+                    <div className="h-4 w-[92%] animate-pulse rounded bg-muted" />
+                    <div className="h-4 w-[86%] animate-pulse rounded bg-muted" />
+                    <div className="h-4 w-[78%] animate-pulse rounded bg-muted" />
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+
+              {!output && !loading && !errorMessage && !limitReached && (
+                <div className="rounded-2xl border border-dashed border-border bg-background/80 px-4 py-5">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <ArrowDown size={16} />
+                    <span>
+                      {mode === "rewrite"
+                        ? "Your rewritten result will appear here after you click Rewrite."
+                        : "Your generated message or document will appear here after you click Generate."}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {output && (
+                <div className="space-y-3">
+                  {showReadyNotice && (
+                    <div className="rounded-2xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm font-medium text-foreground">
+                      Your result is ready below.
+                    </div>
+                  )}
+
+                  <div className="rounded-2xl border border-border bg-background p-4 md:p-5 ring-1 ring-primary/10">
+                    <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="font-semibold text-foreground">Result</p>
+                        <p className="text-xs text-muted-foreground">
+                          Review it, copy it, and edit it however you want.
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleCopy}
+                        className="inline-flex items-center gap-2 self-start rounded-xl border border-border bg-card px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted"
+                      >
+                        {copied ? <Check size={14} /> : <Copy size={14} />}
+                        <span>{copied ? "Copied" : "Copy"}</span>
+                      </button>
+                    </div>
+
+                    <div className="rounded-2xl border border-border bg-card px-4 py-4">
+                      <p className="whitespace-pre-wrap text-sm leading-relaxed text-foreground">
+                        {output}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
