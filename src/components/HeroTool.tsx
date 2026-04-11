@@ -247,7 +247,9 @@ export default function HeroTool({
             proGenerateStyle:
               isPro && mode === "generate" ? proGenerateStyle : "standard",
             toneProfile:
-              isPro && mode === "generate" ? toneProfile ?? undefined : undefined,
+              isPro && mode === "generate"
+                ? toneProfile ?? undefined
+                : undefined,
           },
         }
       );
@@ -314,17 +316,17 @@ export default function HeroTool({
   }
 
   return (
-    <section className="pt-10 pb-8 md:pt-14 md:pb-10">
-      <div className="container max-w-4xl">
-        <div className="rounded-3xl border border-border bg-card p-6 shadow-sm md:p-8">
-          <div className="space-y-6">
-            <div className="space-y-3">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+    <section className="pt-6 pb-6 md:pt-10 md:pb-8">
+      <div className="container max-w-4xl px-4 sm:px-6">
+        <div className="rounded-3xl border border-border bg-card p-4 shadow-sm sm:p-5 md:p-8">
+          <div className="space-y-5 md:space-y-6">
+            <div className="space-y-2">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
                 AI Message Tool
               </p>
 
               <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+                <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl md:text-4xl">
                   {title}
                 </h1>
 
@@ -335,12 +337,12 @@ export default function HeroTool({
             </div>
 
             <div className="rounded-2xl border border-border bg-background/80 px-4 py-4">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-3">
                 <div>
                   <p className="text-sm font-medium text-foreground">
                     {isPro ? "Pro access" : "Free daily usage"}
                   </p>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="mt-1 text-sm text-muted-foreground">
                     {isPro
                       ? "Unlimited usage unlocked on this account"
                       : usesRemaining > 0
@@ -350,7 +352,7 @@ export default function HeroTool({
                 </div>
 
                 {!isPro && (
-                  <div className="h-2 w-full max-w-[180px] overflow-hidden rounded-full bg-muted sm:w-[180px]">
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
                     <div
                       className="h-full rounded-full bg-primary transition-all"
                       style={{
@@ -366,11 +368,11 @@ export default function HeroTool({
             </div>
 
             <div className="space-y-3">
-              <div className="flex flex-wrap gap-3">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <button
                   type="button"
                   onClick={() => setMode("rewrite")}
-                  className={`rounded-xl px-4 py-2 text-sm font-medium transition ${
+                  className={`min-h-[44px] rounded-xl px-4 py-2 text-sm font-medium transition ${
                     mode === "rewrite"
                       ? "bg-primary text-primary-foreground"
                       : "border border-border bg-background text-foreground hover:bg-muted"
@@ -382,7 +384,7 @@ export default function HeroTool({
                 <button
                   type="button"
                   onClick={() => setMode("generate")}
-                  className={`rounded-xl px-4 py-2 text-sm font-medium transition ${
+                  className={`min-h-[44px] rounded-xl px-4 py-2 text-sm font-medium transition ${
                     mode === "generate"
                       ? "bg-primary text-primary-foreground"
                       : "border border-border bg-background text-foreground hover:bg-muted"
@@ -408,7 +410,7 @@ export default function HeroTool({
             </div>
 
             {limitReached && (
-              <div className="rounded-3xl border border-primary/20 bg-primary/5 p-6 md:p-7">
+              <div className="rounded-3xl border border-primary/20 bg-primary/5 p-5 md:p-7">
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
                     <div className="mt-1 text-primary">
@@ -435,15 +437,17 @@ export default function HeroTool({
                       <li>• Unlimited message rewrites</li>
                       <li>• Generate messages from situations</li>
                       <li>• Tone DNA personalization</li>
-                      <li>• “Closer to me” vs “Best for this situation” comparison</li>
+                      <li>
+                        • “Closer to me” vs “Best for this situation” comparison
+                      </li>
                     </ul>
                   </div>
 
-                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex flex-col gap-3">
                     <button
                       type="button"
                       onClick={handleUpgradeClick}
-                      className="inline-flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-95"
+                      className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-95"
                     >
                       Upgrade to Pro
                     </button>
@@ -469,10 +473,10 @@ export default function HeroTool({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={activePlaceholder}
-                className="min-h-[180px] w-full rounded-2xl border border-border bg-background px-4 py-4 text-sm leading-relaxed text-foreground outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+                className="min-h-[180px] w-full rounded-2xl border border-border bg-background px-4 py-4 text-sm leading-relaxed text-foreground outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10 sm:min-h-[200px]"
               />
 
-              <div className="flex flex-col gap-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-1 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
                 <p>
                   Tip: the more useful context you give, the better the result
                   usually is.
@@ -495,11 +499,11 @@ export default function HeroTool({
                     </p>
                   </div>
 
-                  <div className="flex flex-wrap gap-3">
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <button
                       type="button"
                       onClick={() => setProGenerateStyle("standard")}
-                      className={`rounded-xl px-4 py-2 text-sm font-medium transition ${
+                      className={`min-h-[44px] rounded-xl px-4 py-2 text-sm font-medium transition ${
                         proGenerateStyle === "standard"
                           ? "bg-primary text-primary-foreground"
                           : "border border-border bg-background text-foreground hover:bg-muted"
@@ -511,7 +515,7 @@ export default function HeroTool({
                     <button
                       type="button"
                       onClick={() => setProGenerateStyle("compare")}
-                      className={`rounded-xl px-4 py-2 text-sm font-medium transition ${
+                      className={`min-h-[44px] rounded-xl px-4 py-2 text-sm font-medium transition ${
                         proGenerateStyle === "compare"
                           ? "bg-primary text-primary-foreground"
                           : "border border-border bg-background text-foreground hover:bg-muted"
@@ -537,8 +541,8 @@ export default function HeroTool({
               </div>
             )}
 
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <div className="space-y-3">
+              <div className="space-y-2">
                 <label
                   htmlFor="hero-tool-tone"
                   className="text-sm font-medium text-foreground"
@@ -550,7 +554,7 @@ export default function HeroTool({
                   id="hero-tool-tone"
                   value={tone}
                   onChange={(e) => setTone(e.target.value)}
-                  className="rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+                  className="min-h-[44px] w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
                 >
                   {toneOptions.map((option) => (
                     <option key={option} value={option}>
@@ -560,11 +564,11 @@ export default function HeroTool({
                 </select>
               </div>
 
-              <div className="flex flex-wrap gap-3">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <button
                   type="button"
                   onClick={handleClear}
-                  className="rounded-xl border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted"
+                  className="min-h-[44px] rounded-xl border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted"
                 >
                   Clear
                 </button>
@@ -573,7 +577,7 @@ export default function HeroTool({
                   type="button"
                   onClick={handleGenerate}
                   disabled={!canGenerate}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <Sparkles size={16} />
                   {loading
@@ -593,7 +597,7 @@ export default function HeroTool({
               </div>
             )}
 
-            <div ref={outputRef} className="scroll-mt-28">
+            <div ref={outputRef} className="scroll-mt-24 md:scroll-mt-28">
               {loading && (
                 <div className="rounded-2xl border border-primary/20 bg-primary/5 px-4 py-5">
                   <div className="mb-3 flex items-center gap-2 text-sm font-medium text-foreground">
@@ -619,8 +623,8 @@ export default function HeroTool({
 
               {!output && !loading && !errorMessage && !limitReached && (
                 <div className="rounded-2xl border border-dashed border-border bg-background/80 px-4 py-5">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <ArrowDown size={16} />
+                  <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                    <ArrowDown size={16} className="mt-0.5 shrink-0" />
                     <span>
                       {mode === "rewrite"
                         ? "Your rewritten result will appear here after you click Rewrite."
@@ -638,8 +642,8 @@ export default function HeroTool({
                     </div>
                   )}
 
-                  <div className="rounded-2xl border border-border bg-background p-4 md:p-5 ring-1 ring-primary/10">
-                    <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="rounded-2xl border border-border bg-background p-4 ring-1 ring-primary/10 md:p-5">
+                    <div className="mb-3 flex flex-col gap-3">
                       <div>
                         <p className="font-semibold text-foreground">Result</p>
                         <p className="text-xs text-muted-foreground">
@@ -650,7 +654,7 @@ export default function HeroTool({
                       <button
                         type="button"
                         onClick={handleCopy}
-                        className="inline-flex items-center gap-2 self-start rounded-xl border border-border bg-card px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted"
+                        className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted sm:w-fit"
                       >
                         {copied ? <Check size={14} /> : <Copy size={14} />}
                         <span>{copied ? "Copied" : "Copy"}</span>
