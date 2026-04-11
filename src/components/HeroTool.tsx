@@ -316,10 +316,10 @@ export default function HeroTool({
   }
 
   return (
-    <section className="pt-6 pb-6 md:pt-10 md:pb-8">
+    <section className="pt-4 pb-5 md:pt-10 md:pb-8">
       <div className="container max-w-4xl px-4 sm:px-6">
         <div className="rounded-3xl border border-border bg-card p-4 shadow-sm sm:p-5 md:p-8">
-          <div className="space-y-5 md:space-y-6">
+          <div className="space-y-4 md:space-y-6">
             <div className="space-y-2">
               <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-primary">
                 AI Message Tool
@@ -336,8 +336,8 @@ export default function HeroTool({
               </div>
             </div>
 
-            <div className="rounded-2xl border border-border bg-background/80 px-4 py-4">
-              <div className="flex flex-col gap-3">
+            <div className="rounded-2xl border border-border bg-background/80 px-4 py-3 md:px-4 md:py-4">
+              <div className="flex flex-col gap-2">
                 <div>
                   <p className="text-sm font-medium text-foreground">
                     {isPro ? "Pro access" : "Free daily usage"}
@@ -367,7 +367,7 @@ export default function HeroTool({
               </div>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                 <button
                   type="button"
@@ -394,7 +394,7 @@ export default function HeroTool({
                 </button>
               </div>
 
-              <div className="rounded-2xl border border-border bg-background/80 px-4 py-4">
+              <div className="rounded-2xl border border-border bg-background/80 px-4 py-3 md:px-4 md:py-4">
                 <p className="text-sm font-medium text-foreground">
                   {modeHeading}
                 </p>
@@ -460,7 +460,7 @@ export default function HeroTool({
               </div>
             )}
 
-            <div className="space-y-3">
+            <div className="space-y-2">
               <label
                 htmlFor="hero-tool-input"
                 className="text-sm font-medium text-foreground"
@@ -473,10 +473,10 @@ export default function HeroTool({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={activePlaceholder}
-                className="min-h-[180px] w-full rounded-2xl border border-border bg-background px-4 py-4 text-sm leading-relaxed text-foreground outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10 sm:min-h-[200px]"
+                className="min-h-[170px] w-full rounded-2xl border border-border bg-background px-4 py-4 text-sm leading-relaxed text-foreground outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10 sm:min-h-[200px]"
               />
 
-              <div className="flex flex-col gap-1 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-1 text-xs text-muted-foreground">
                 <p>
                   Tip: the more useful context you give, the better the result
                   usually is.
@@ -486,7 +486,7 @@ export default function HeroTool({
             </div>
 
             {mode === "generate" && isPro && (
-              <div className="rounded-2xl border border-border bg-background/80 px-4 py-4">
+              <div className="rounded-2xl border border-border bg-background/80 px-4 py-3 md:px-4 md:py-4">
                 <div className="space-y-3">
                   <div>
                     <p className="text-sm font-medium text-foreground">
@@ -529,66 +529,76 @@ export default function HeroTool({
             )}
 
             {mode === "generate" && !isPro && (
-              <div className="rounded-2xl border border-border bg-background/80 px-4 py-4">
-                <p className="text-sm font-medium text-foreground">
-                  Pro feature available
-                </p>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Pro users can compare a version that feels closer to their
-                  natural voice with a version that is best suited for the
-                  situation.
-                </p>
-              </div>
+              <>
+                <div className="hidden md:block rounded-2xl border border-border bg-background/80 px-4 py-4">
+                  <p className="text-sm font-medium text-foreground">
+                    Pro feature available
+                  </p>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Pro users can compare a version that feels closer to their
+                    natural voice with a version that is best suited for the
+                    situation.
+                  </p>
+                </div>
+
+                <div className="md:hidden">
+                  <button
+                    type="button"
+                    onClick={handleUpgradeClick}
+                    className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                  >
+                    Learn more about Pro
+                  </button>
+                </div>
+              </>
             )}
 
-            <div className="space-y-3">
-              <div className="space-y-2">
-                <label
-                  htmlFor="hero-tool-tone"
-                  className="text-sm font-medium text-foreground"
-                >
-                  Tone
-                </label>
+            <div className="space-y-2">
+              <label
+                htmlFor="hero-tool-tone"
+                className="text-sm font-medium text-foreground"
+              >
+                Tone
+              </label>
 
-                <select
-                  id="hero-tool-tone"
-                  value={tone}
-                  onChange={(e) => setTone(e.target.value)}
-                  className="min-h-[44px] w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
-                >
-                  {toneOptions.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <select
+                id="hero-tool-tone"
+                value={tone}
+                onChange={(e) => setTone(e.target.value)}
+                className="min-h-[44px] w-full rounded-xl border border-border bg-background px-3 py-2 text-sm outline-none transition focus:border-primary/40 focus:ring-2 focus:ring-primary/10"
+              >
+                {toneOptions.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                <button
-                  type="button"
-                  onClick={handleClear}
-                  className="min-h-[44px] rounded-xl border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted"
-                >
-                  Clear
-                </button>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={handleClear}
+                className="min-h-[44px] rounded-xl border border-border bg-background px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted"
+              >
+                Clear
+              </button>
 
-                <button
-                  type="button"
-                  onClick={handleGenerate}
-                  disabled={!canGenerate}
-                  className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <Sparkles size={16} />
-                  {loading
-                    ? mode === "rewrite"
-                      ? "Rewriting..."
-                      : "Generating..."
-                    : mode === "rewrite"
-                    ? "Rewrite"
-                    : "Generate"}
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={handleGenerate}
+                disabled={!canGenerate}
+                className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <Sparkles size={16} />
+                {loading
+                  ? mode === "rewrite"
+                    ? "Rewriting..."
+                    : "Generating..."
+                  : mode === "rewrite"
+                  ? "Rewrite"
+                  : "Generate"}
+              </button>
             </div>
 
             {errorMessage && (
@@ -622,7 +632,7 @@ export default function HeroTool({
               )}
 
               {!output && !loading && !errorMessage && !limitReached && (
-                <div className="rounded-2xl border border-dashed border-border bg-background/80 px-4 py-5">
+                <div className="rounded-2xl border border-dashed border-border bg-background/80 px-4 py-4">
                   <div className="flex items-start gap-2 text-sm text-muted-foreground">
                     <ArrowDown size={16} className="mt-0.5 shrink-0" />
                     <span>

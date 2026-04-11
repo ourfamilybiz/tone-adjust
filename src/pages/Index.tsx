@@ -36,7 +36,94 @@ const Index = () => {
         />
       </Helmet>
 
-      <section className="relative overflow-hidden border-b border-border/70 bg-[#071126] text-white">
+      {/* MOBILE-FIRST HERO */}
+      <section className="border-b border-border/70 bg-[#071126] text-white md:hidden">
+        <div className="container px-4 py-6">
+          <div className="space-y-5">
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center rounded-full border border-white/15 bg-white/6 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-200">
+                  Aision Labs
+                </span>
+
+                <span className="inline-flex items-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-100">
+                  Cognitive Division
+                </span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <img
+                  src="/aision-cognitive-logo.png"
+                  alt="Aision Cognitive Systems"
+                  className="h-14 w-14 rounded-2xl object-cover shadow-[0_0_30px_rgba(84,143,255,0.25)]"
+                />
+
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200/90">
+                    Say It Better
+                  </p>
+                  <p className="text-sm text-white/70">
+                    Clearer messages. Less overthinking.
+                  </p>
+                </div>
+              </div>
+
+              <h1 className="text-4xl font-bold leading-[0.95] tracking-tight text-white">
+                Fix your message in seconds.
+              </h1>
+
+              <p className="text-base leading-relaxed text-white/75">
+                Paste what you wrote or describe the situation. Say It Better
+                helps you send something clearer, calmer, and more professional.
+              </p>
+            </div>
+
+            <div className="grid gap-3">
+              <div className="rounded-2xl border border-white/10 bg-white/6 p-4">
+                <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/12 text-cyan-200">
+                  <PenSquare size={18} />
+                </div>
+                <p className="font-semibold text-white">Rewrite what you wrote</p>
+                <p className="mt-1 text-sm leading-relaxed text-white/70">
+                  Improve tone, clarity, and wording without losing your meaning.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-white/10 bg-white/6 p-4">
+                <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-xl bg-violet-400/12 text-violet-200">
+                  <Sparkles size={18} />
+                </div>
+                <p className="font-semibold text-white">
+                  Generate from the situation
+                </p>
+                <p className="mt-1 text-sm leading-relaxed text-white/70">
+                  Explain what happened and let the tool create the message for
+                  you.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <a
+                href="#hero-tool"
+                className="inline-flex min-h-[48px] items-center justify-center rounded-xl bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-500 px-5 py-3 text-base font-semibold text-white shadow-[0_0_30px_rgba(73,138,255,0.28)] transition hover:scale-[1.01]"
+              >
+                Start Writing
+              </a>
+
+              <Link
+                to="/upgrade"
+                className="inline-flex min-h-[48px] items-center justify-center rounded-xl border border-white/14 bg-white/6 px-5 py-3 text-base font-semibold text-white/90 transition hover:bg-white/10"
+              >
+                View Pro
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* DESKTOP HERO */}
+      <section className="relative hidden overflow-hidden border-b border-border/70 bg-[#071126] text-white md:block">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(88,110,255,0.22),transparent_38%),radial-gradient(circle_at_top_right,rgba(0,214,255,0.14),transparent_28%),radial-gradient(circle_at_bottom_center,rgba(122,69,255,0.16),transparent_34%)]" />
 
         <div className="relative container max-w-6xl py-12 md:py-20">
@@ -215,6 +302,263 @@ const Index = () => {
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* MOBILE TOOL FIRST */}
+      <div id="hero-tool" className="md:hidden">
+        <HeroTool
+          title="Say it better in seconds."
+          subtitle="Paste a message you already wrote or describe your situation and get help with what to say — fast."
+          placeholder="Paste your message or describe the situation here..."
+          defaultTone="Professional"
+        />
+      </div>
+
+      {/* MOBILE SUPPORTING CONTENT */}
+      <section className="pb-8 md:hidden">
+        <div className="container max-w-4xl px-4">
+          <div className="rounded-3xl border border-border bg-card p-5 shadow-sm">
+            <div className="space-y-4">
+              <h2 className="text-2xl font-semibold tracking-tight">
+                When to use Say It Better
+              </h2>
+
+              <p className="text-sm leading-relaxed text-muted-foreground">
+                Use it when you need help improving a message you already wrote
+                or creating the right message from a situation.
+              </p>
+            </div>
+
+            <div className="space-y-3 pt-4">
+              <h2 className="text-xl font-semibold tracking-tight">
+                What it helps with
+              </h2>
+
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>• rewriting emails and messages</li>
+                <li>• improving tone and clarity</li>
+                <li>• fixing awkward wording</li>
+                <li>• generating a message from a situation</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* DESKTOP SUPPORTING CONTENT */}
+      <section className="hidden pb-12 pt-12 md:block">
+        <div className="container max-w-4xl space-y-6">
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm md:p-8">
+            <div className="space-y-4">
+              <h2 className="text-2xl font-semibold tracking-tight">
+                When to use Say It Better
+              </h2>
+
+              <p className="text-sm leading-relaxed text-muted-foreground md:text-base">
+                Use Say It Better when you need help improving a message you
+                already wrote or creating the right message from a situation. It
+                is especially useful for work communication, customer replies,
+                follow-ups, apology messages, and situations where tone, clarity,
+                and professionalism matter.
+              </p>
+            </div>
+
+            <div className="space-y-4 pt-4">
+              <h2 className="text-2xl font-semibold tracking-tight">
+                What Say It Better helps with
+              </h2>
+
+              <ul className="space-y-2 text-sm text-muted-foreground md:text-base">
+                <li>• rewriting emails and messages</li>
+                <li>• improving tone, clarity, and professionalism</li>
+                <li>• fixing awkward or unclear wording</li>
+                <li>• generating a message or document from a situation</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* DESKTOP TOOL */}
+      <div id="hero-tool-desktop" className="hidden md:block">
+        <HeroTool
+          title="Say it better in seconds."
+          subtitle="Paste a message you already wrote or describe your situation and get help with what to say — fast."
+          placeholder="Paste your message or describe the situation here..."
+          defaultTone="Professional"
+        />
+      </div>
+
+      {/* DESKTOP EXPLANATION CARDS */}
+      <section className="hidden pb-12 md:block">
+        <div className="container max-w-6xl">
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <PenSquare size={22} />
+              </div>
+
+              <h2 className="text-2xl font-semibold tracking-tight">
+                Already wrote something?
+              </h2>
+
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-base">
+                Paste your text and improve the tone, clarity, and wording in
+                seconds.
+              </p>
+
+              <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4">
+                <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                  Example
+                </p>
+                <p className="mt-2 text-sm leading-relaxed">
+                  “hey just checking if you got my message”
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-border bg-card p-6 shadow-sm">
+              <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                <Sparkles size={22} />
+              </div>
+
+              <h2 className="text-2xl font-semibold tracking-tight">
+                Need the message created for you?
+              </h2>
+
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-base">
+                Describe what happened, who the message is for, and the tone you
+                want. The tool will write the message for you.
+              </p>
+
+              <div className="mt-4 rounded-2xl border border-border bg-muted/40 p-4">
+                <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                  Example
+                </p>
+                <p className="mt-2 text-sm leading-relaxed">
+                  “I forgot to reply to a client for two days and need to
+                  apologize professionally.”
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* MOBILE TOOL LINKS */}
+      <section className="pb-8 md:hidden">
+        <div className="container max-w-6xl px-4">
+          <div className="rounded-3xl border border-border bg-card p-5 shadow-sm">
+            <div className="max-w-2xl">
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+                Explore Tools
+              </p>
+
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight">
+                Start with the tool that fits your situation
+              </h2>
+
+              <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                Pick the tool that matches what you need to say.
+              </p>
+            </div>
+
+            <div className="mt-5 grid gap-3">
+              {allTools.slice(0, 4).map((tool) => {
+                const Icon = tool.icon;
+
+                return (
+                  <Link
+                    key={tool.href}
+                    to={tool.href}
+                    className="group rounded-2xl border border-border bg-background p-4 transition-all hover:border-primary/20 hover:bg-primary/5 hover:shadow-sm"
+                  >
+                    <div className="mb-3 inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
+                      <Icon size={18} />
+                    </div>
+
+                    <h3 className="text-base font-semibold tracking-tight">
+                      {tool.name}
+                    </h3>
+
+                    <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                      {tool.description}
+                    </p>
+                  </Link>
+                );
+              })}
+            </div>
+
+            <div className="mt-4">
+              <Link
+                to="/tools"
+                className="inline-flex items-center gap-2 text-sm font-medium text-primary"
+              >
+                View all tools
+                <ArrowRight size={16} />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* DESKTOP TOOL LINKS */}
+      <section className="hidden pb-12 md:block">
+        <div className="container max-w-6xl">
+          <div className="rounded-3xl border border-border bg-card p-6 shadow-sm md:p-8">
+            <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <div className="max-w-2xl">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+                  Explore Tools
+                </p>
+
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight md:text-3xl">
+                  Start with the tool that fits your situation
+                </h2>
+
+                <p className="mt-2 text-sm leading-relaxed text-muted-foreground md:text-base">
+                  Choose a simple tool below. Each one is built for a specific
+                  type of message, so you can get a better result faster without
+                  overthinking what to say.
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {allTools.slice(0, 6).map((tool) => {
+                const Icon = tool.icon;
+
+                return (
+                  <Link
+                    key={tool.href}
+                    to={tool.href}
+                    className="group rounded-2xl border border-border bg-background p-5 transition-all hover:border-primary/20 hover:bg-primary/5 hover:shadow-sm"
+                  >
+                    <div className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-primary/10 text-primary transition group-hover:bg-primary group-hover:text-primary-foreground">
+                      <Icon size={20} />
+                    </div>
+
+                    <h3 className="text-lg font-semibold tracking-tight">
+                      {tool.name}
+                    </h3>
+
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                      {tool.description}
+                    </p>
+
+                    <div className="mt-4 inline-flex items-center gap-2 text-sm font-medium text-primary">
+                      Open tool
+                      <ArrowRight
+                        size={16}
+                        className="transition-transform group-hover:translate-x-1"
+                      />
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>
