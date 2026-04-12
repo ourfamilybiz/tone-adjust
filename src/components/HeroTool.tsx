@@ -87,6 +87,12 @@ function normalizeTone(defaultTone: string) {
   return "Professional";
 }
 
+function getNextTone(currentTone: string) {
+  const currentIndex = toneOptions.indexOf(currentTone);
+  if (currentIndex === -1) return toneOptions[0];
+  return toneOptions[(currentIndex + 1) % toneOptions.length];
+}
+
 export default function HeroTool({
   title,
   subtitle,
@@ -225,7 +231,12 @@ export default function HeroTool({
       ? "Example: My client has not paid the invoice, this is for a business customer, I want to sound firm but respectful, and I want them to pay by Friday."
       : "";
 
-  async function handleGenerate(isRegenerate = false) {
+  async function handleGenerate(
+    isRegenerate = false,
+    overrideTone?: string
+  ) {
+    const activeTone = overrideTone || tone;
+
     if (!trimmedInput || limitReached) return;
 
     setLoading(true);
@@ -249,7 +260,7 @@ export default function HeroTool({
         {
           body: {
             text: trimmedInput,
-            tone,
+            tone: activeTone,
             mode,
             variation,
             proGenerateStyle:
@@ -307,6 +318,14 @@ export default function HeroTool({
       console.error(err);
       setErrorMessage("Could not copy the result.");
     }
+  }
+
+  async function handleTryDifferentTone() {
+    if (!trimmedInput || loading || limitReached) return;
+
+    const nextTone = getNextTone(tone);
+    setTone(nextTone);
+    await handleGenerate(true, nextTone);
   }
 
   function handleClear() {
@@ -669,6 +688,9 @@ export default function HeroTool({
                         <p className="text-xs text-muted-foreground">
                           Review it, copy it, and edit it however you want.
                         </p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          Current tone: {tone}
+                        </p>
                       </div>
 
                       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
@@ -689,6 +711,16 @@ export default function HeroTool({
                         >
                           <RefreshCcw size={14} />
                           Generate Another
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={handleTryDifferentTone}
+                          disabled={loading || limitReached}
+                          className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-2 text-sm font-medium text-foreground transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <Sparkles size={14} />
+                          Try Different Tone
                         </button>
                       </div>
                     </div>
