@@ -116,6 +116,7 @@ export default function HeroTool({
   const [proGenerateStyle, setProGenerateStyle] =
     useState<ProGenerateStyle>("standard");
   const [showReadyNotice, setShowReadyNotice] = useState(false);
+  const [regenerateCount, setRegenerateCount] = useState(0);
 
   useEffect(() => {
     const usage = getUsageState();
@@ -148,6 +149,10 @@ export default function HeroTool({
       window.clearTimeout(hideTimer);
     };
   }, [output]);
+
+  useEffect(() => {
+    setRegenerateCount(0);
+  }, [input, tone, mode]);
 
   async function loadSubscription() {
     try {
@@ -220,7 +225,7 @@ export default function HeroTool({
       ? "Example: My client has not paid the invoice, this is for a business customer, I want to sound firm but respectful, and I want them to pay by Friday."
       : "";
 
-  async function handleGenerate() {
+  async function handleGenerate(isRegenerate = false) {
     if (!trimmedInput || limitReached) return;
 
     setLoading(true);
@@ -237,6 +242,8 @@ export default function HeroTool({
     }
 
     try {
+      const variation = isRegenerate ? regenerateCount + 1 : 0;
+
       const { data, error } = await supabase.functions.invoke(
         "rewrite-message",
         {
@@ -244,6 +251,7 @@ export default function HeroTool({
             text: trimmedInput,
             tone,
             mode,
+            variation,
             proGenerateStyle:
               isPro && mode === "generate" ? proGenerateStyle : "standard",
             toneProfile:
@@ -266,6 +274,7 @@ export default function HeroTool({
       }
 
       setOutput(data.result);
+      setRegenerateCount(variation);
 
       if (!isPro) {
         const nextUsage = {
@@ -309,6 +318,7 @@ export default function HeroTool({
     setMode("rewrite");
     setProGenerateStyle("standard");
     setShowReadyNotice(false);
+    setRegenerateCount(0);
   }
 
   function handleUpgradeClick() {
@@ -586,7 +596,7 @@ export default function HeroTool({
 
               <button
                 type="button"
-                onClick={handleGenerate}
+                onClick={() => handleGenerate(false)}
                 disabled={!canGenerate}
                 className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
               >
@@ -661,14 +671,26 @@ export default function HeroTool({
                         </p>
                       </div>
 
-                      <button
-                        type="button"
-                        onClick={handleCopy}
-                        className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted sm:w-fit"
-                      >
-                        {copied ? <Check size={14} /> : <Copy size={14} />}
-                        <span>{copied ? "Copied" : "Copy"}</span>
-                      </button>
+                      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                        <button
+                          type="button"
+                          onClick={handleCopy}
+                          className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl border border-border bg-card px-3 py-2 text-sm font-medium text-foreground transition hover:bg-muted"
+                        >
+                          {copied ? <Check size={14} /> : <Copy size={14} />}
+                          <span>{copied ? "Copied" : "Copy"}</span>
+                        </button>
+
+                        <button
+                          type="button"
+                          onClick={() => handleGenerate(true)}
+                          disabled={loading || limitReached}
+                          className="inline-flex min-h-[44px] items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <RefreshCcw size={14} />
+                          Generate Another
+                        </button>
+                      </div>
                     </div>
 
                     <div className="rounded-2xl border border-border bg-card px-4 py-4">
